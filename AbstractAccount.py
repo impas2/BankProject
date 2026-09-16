@@ -1,11 +1,14 @@
 import abc
 from decimal import Decimal
+from enum import Enum
+
 class AbstractAccount(abc.ABC):
 
     def __init__(self,person, account_id):
         self.account_id = account_id
         self.person = person
         self.__balance = Decimal(0)
+        self.status = AccountStatus.ACTIVE
 
     @abc.abstractmethod
     def deposit(self, amount):pass
@@ -14,6 +17,14 @@ class AbstractAccount(abc.ABC):
     @abc.abstractmethod
     def get_account_info(self):pass
 
+    @property
+    def status(self):
+        return self.status
+    @status.setter
+    def status(self, status):
+        self.status = status
+
+    @property
     def get_balance(self):
         return self.__balance
     def add_balance(self, amount):
@@ -27,3 +38,9 @@ class Person:
         self.age = age
         self.address = address
         self.birth_date = birth_date
+
+
+class AccountStatus(Enum):
+    ACTIVE = 0
+    CLOSED = 1
+    FROZEN = 2
