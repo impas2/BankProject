@@ -11,6 +11,8 @@ class Person:
         self.address = address
         self.birth_date = birth_date
 
+    def __str__(self):
+        return f"Person {self.name} {self.age} {self.address} {self.birth_date}"
 
 class AccountStatus(Enum):
     ACTIVE = 0
@@ -23,13 +25,17 @@ class AccountType(Enum):
 
 class AbstractAccount(abc.ABC):
 
-    def __init__(self, person: Person, account_id: UUID, account_number: str, account_type: AccountType):
+    def __init__(self, person: Person,
+                 account_id: UUID,
+                 account_number: str,
+                 account_type: AccountType,
+                 balance: Decimal = Decimal(0)):
         self.account_id = account_id
         self.account_number = account_number
         self.person = person
         self.type = account_type
-        self.__balance = Decimal(0)
-        self.status = AccountStatus.ACTIVE
+        self._balance = balance
+        self.account_status = AccountStatus.ACTIVE
 
     @abc.abstractmethod
     def deposit(self, amount : Decimal, currency : Currency): pass
@@ -41,13 +47,18 @@ class AbstractAccount(abc.ABC):
     def get_account_info(self): pass
 
     @property
-    def status(self):
-        return self.status
+    def account_status(self):
+        return self._account_status
 
-    @status.setter
-    def status(self, status):
-        self.status = status
+    @account_status.setter
+    def account_status(self, status: AccountStatus):
+        if isinstance(status, AccountStatus):
+            self._account_status = status
 
     @property
     def get_balance(self):
-        return self.__balance
+        return self._balance
+
+    @property
+    def get_account_type(self):
+        return self.type
