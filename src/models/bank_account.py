@@ -1,10 +1,10 @@
 from json.decoder import NaN
 
-from abstract_account import Person
+from models.abstract_account import Person
 from uuid import UUID as uuid
-from abstract_account import AbstractAccount
+from models.abstract_account import AbstractAccount
 from currency import Currency
-from abstract_account import AccountStatus
+from models.abstract_account import AccountStatus
 from account_errors import AccountClosedError, InvalidOperationError, InsufficientFundsError
 from account_errors import AccountFrozenError
 from decimal import Decimal

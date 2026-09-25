@@ -3,9 +3,9 @@ from decimal import Decimal
 
 import pytest
 
-from abstract_account import Person, AccountType, AccountStatus
+from models.abstract_account import Person, AccountType, AccountStatus
 from account_errors import AccountFrozenError
-from bank_account import BankAccount
+from models.bank_account import BankAccount
 from currency import Currency
 
 @pytest.fixture
