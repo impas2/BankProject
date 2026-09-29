@@ -1,39 +1,59 @@
-from json.decoder import NaN
-
-from models.abstract_account import Person
-from uuid import UUID as uuid
-from models.abstract_account import AbstractAccount
-from currency import Currency
-from models.abstract_account import AccountStatus
-from account_errors import AccountClosedError, InvalidOperationError, InsufficientFundsError
-from account_errors import AccountFrozenError
+import uuid
 from decimal import Decimal
+from typing import Optional
+from uuid import UUID
+
+from account_errors import (
+    AccountClosedError,
+    AccountFrozenError,
+    InsufficientFundsError,
+    InvalidOperationError,
+)
+from currency import Currency
+from models.abstract_account import AbstractAccount, AccountStatus, AccountType, Person
+
 
 class BankAccount(AbstractAccount):
+    def __init__(
+        self,
+        person: Person,
+        account_id: Optional[UUID],
+        currency: Currency,
+        account_number: Optional[str],
+        account_type: AccountType,
+        balance: Decimal = Decimal(0),
+    ) -> None:
+        if not isinstance(currency, Currency):
+            raise InvalidOperationError("Валюта счёта должна быть Currency")
 
-    def __init__(self, person: Person, account_id, currency: Currency, account_number: str, account_type, balance: Decimal = Decimal(0)):
+        if account_number is None:
+            account_number = str(uuid.uuid4())
         if account_id is None:
-            account_id = uuid()
+            account_id = uuid.uuid4()
         super().__init__(person, account_id, account_number, account_type, balance)
         self.currency = currency
 
-    def validate_frozen(self):
+    def validate_frozen(self) -> None:
         if self.account_status == AccountStatus.FROZEN:
             raise AccountFrozenError(f"Account {self.account_id} is frozen")
 
-    def validate_closed(self):
+    def validate_closed(self) -> None:
         if self.account_status == AccountStatus.CLOSED:
             raise AccountClosedError(f"Account {self.account_id} is closed")
 
-    def validate_currency(self, currency):
+    def validate_currency(self, currency: Currency) -> None:
         if self.currency != currency:
-            raise InvalidOperationError(f"Account {self.account_id} does not support currency {currency}")
+            raise InvalidOperationError(
+                f"Account {self.account_id} does not support currency {currency}"
+            )
 
-    def validate_balance(self, amount:Decimal):
+    def validate_balance(self, amount: Decimal) -> None:
         if self.get_balance < amount:
-            raise InsufficientFundsError(f"Account {self.account_id} does not have enough funds")
+            raise InsufficientFundsError(
+                f"Account {self.account_id} does not have enough funds"
+            )
 
-    def validate_amount(self, amount: Decimal):
+    def validate_amount(self, amount: Decimal) -> None:
         if not isinstance(amount, Decimal):
             raise InvalidOperationError("Сумма должна быть Decimal")
 
@@ -43,14 +63,14 @@ class BankAccount(AbstractAccount):
         if amount < 0:
             raise InvalidOperationError("Сумма не может быть отрицательной")
 
-    def deposit(self, amount, currency):
+    def deposit(self, amount: Decimal, currency: Currency) -> None:
         self.validate_closed()
         self.validate_frozen()
         self.validate_currency(currency)
         self.validate_amount(amount)
         self._balance += amount
 
-    def withdraw(self, amount, currency):
+    def withdraw(self, amount: Decimal, currency: Currency) -> None:
         self.validate_closed()
         self.validate_frozen()
         self.validate_currency(currency)
@@ -58,8 +78,12 @@ class BankAccount(AbstractAccount):
         self.validate_balance(amount)
         self._balance -= amount
 
-    def get_account_info(self):
+    def get_account_info(self) -> None:
         print(f"Account {self.account_id} has {self.get_balance} {self.currency}")
 
-    def __str__(self):
-        return f"Account {self.account_id} has {self.type} {self.person} {self.account_number[-4:]} {self.get_balance} {self.currency} {self.account_status}"
+    def __str__(self) -> str:
+        return (
+            f"Account {self.account_id} has {self.type} {self.person} "
+            f"{self.account_number[-4:]} {self.get_balance} "
+            f"{self.currency} {self.account_status}"
+        )
