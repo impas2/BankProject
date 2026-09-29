@@ -1,3 +1,4 @@
+import re
 from collections.abc import Callable
 from decimal import Decimal
 from typing import Any
@@ -21,6 +22,18 @@ def account(make_savings_account: Callable[..., SavingsAccount]) -> SavingsAccou
 
 
 class TestSavingsAccount:
+    @pytest.mark.parametrize("number_kwargs", [{}, {"account_number": None}])
+    def test_accepts_omitted_or_none_account_number(
+        self,
+        account_creation_data: dict[str, Any],
+        number_kwargs: dict[str, Any],
+    ) -> None:
+        account = SavingsAccount(**account_creation_data, **number_kwargs)
+
+        assert re.fullmatch(r"[0-9a-f]{12}", account.account_number)
+        assert account.account_id == account_creation_data["account_id"]
+        assert account.get_account_type is AccountType.SAVINGS
+
     def test_account_has_savings_type(self, account: SavingsAccount) -> None:
         assert account.get_account_type is AccountType.SAVINGS
         assert account.account_status is AccountStatus.ACTIVE

@@ -11,7 +11,7 @@ from models.bank_account import BankAccount
 class PremiumAccount(BankAccount):
     def __init__(self, person: Person,
                  account_id: Optional[UUID], currency: Currency,
-                 account_number: Optional[str],
+                 account_number: Optional[str] = None,
                  withdrawal_limit: Decimal = Decimal(0),
                  overdraft_limit: Decimal = Decimal(0),
                  withdrawal_fee: Decimal = Decimal(0),

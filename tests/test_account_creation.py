@@ -1,3 +1,4 @@
+import re
 from decimal import Decimal
 from typing import Any
 from uuid import UUID, uuid4
@@ -96,6 +97,31 @@ def test_constructor_defaults_to_zero_balance(account_data: dict[str, Any]) -> N
     assert account.get_balance == Decimal("0")
 
 
+@pytest.mark.parametrize("omit_account_type", [False, True])
+def test_constructor_accepts_omitted_account_number(
+    account_data: dict[str, Any], omit_account_type: bool
+) -> None:
+    del account_data["account_number"]
+    if omit_account_type:
+        del account_data["account_type"]
+
+    account = BankAccount(**account_data)
+
+    assert re.fullmatch(r"[0-9a-f]{12}", account.account_number)
+    assert account.account_id == account_data["account_id"]
+    assert account.get_account_type is AccountType.CURRENT
+
+
+def test_constructor_preserves_explicit_number_in_full(
+    account_data: dict[str, Any],
+) -> None:
+    account_data["account_number"] = "000012345678901234567890"
+
+    account = BankAccount(**account_data)
+
+    assert account.account_number == "000012345678901234567890"
+
+
 @pytest.mark.parametrize(
     "missing_fields",
     [("account_id",), ("account_number",), ("account_id", "account_number")],
@@ -115,6 +141,9 @@ def test_constructor_generates_missing_identifiers(
     for field in ("account_id", "account_number"):
         if field in missing_fields:
             assert getattr(first_account, field) != getattr(second_account, field)
+            if field == "account_number":
+                assert re.fullmatch(r"[0-9a-f]{12}", first_account.account_number)
+                assert re.fullmatch(r"[0-9a-f]{12}", second_account.account_number)
         else:
             assert getattr(first_account, field) == account_data[field]
 

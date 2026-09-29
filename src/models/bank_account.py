@@ -19,15 +19,15 @@ class BankAccount(AbstractAccount):
         person: Person,
         account_id: Optional[UUID],
         currency: Currency,
-        account_number: Optional[str],
-        account_type: AccountType,
+        account_number: Optional[str] = None,
+        account_type: AccountType = AccountType.CURRENT,
         balance: Decimal = Decimal(0),
     ) -> None:
         if not isinstance(currency, Currency):
             raise InvalidOperationError("Валюта счёта должна быть Currency")
 
         if account_number is None:
-            account_number = str(uuid.uuid4())
+            account_number = uuid.uuid4().hex[:12]
         if account_id is None:
             account_id = uuid.uuid4()
         super().__init__(person, account_id, account_number, account_type, balance)

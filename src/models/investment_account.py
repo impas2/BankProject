@@ -19,8 +19,8 @@ class InvestmentActive(Enum):
 class InvestmentAccount(BankAccount):
     def __init__(self, person: Person,
                  account_id: Optional[UUID], currency: Currency,
-                 account_number: Optional[str],
-                 growth_rates: Optional[dict]
+                 account_number: Optional[str] = None,
+                 growth_rates: Optional[dict] = None,
                  ) -> None:
 
         super().__init__(person, account_id, currency, account_number,

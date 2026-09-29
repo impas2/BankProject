@@ -23,6 +23,14 @@ def account_details() -> dict[str, Any]:
 
 
 @pytest.fixture
+def account_creation_data() -> dict[str, Any]:
+    """Общие аргументы конструктора без номера счёта."""
+    details = account_details()
+    del details["account_number"]
+    return details
+
+
+@pytest.fixture
 def make_savings_account() -> Callable[..., SavingsAccount]:
     def make(
         *,

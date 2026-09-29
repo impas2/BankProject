@@ -10,7 +10,7 @@ from models.bank_account import BankAccount
 class SavingsAccount(BankAccount):
     def __init__(self, person: Person,
                  account_id: Optional[UUID], currency: Currency,
-                 account_number: Optional[str],
+                 account_number: Optional[str] = None,
                  min_balance: Decimal = Decimal(0),
                  monthly_interest_rate: Decimal = Decimal(0)) -> None:
 
@@ -51,4 +51,3 @@ class SavingsAccount(BankAccount):
     def apply_monthly_interest(self) -> None:
         interest = (self.get_balance * self.monthly_interest_rate).quantize(Decimal("0.01"))
         self.deposit(interest, self.currency)
-

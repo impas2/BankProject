@@ -1,3 +1,4 @@
+import re
 from collections.abc import Callable
 from decimal import Decimal
 from typing import Any
@@ -11,7 +12,7 @@ from account_errors import (
     InvalidOperationError,
 )
 from currency import Currency
-from models.abstract_account import AccountStatus
+from models.abstract_account import AccountStatus, AccountType
 from models.premium_account import PremiumAccount
 
 
@@ -21,6 +22,18 @@ def account(make_premium_account: Callable[..., PremiumAccount]) -> PremiumAccou
 
 
 class TestPremiumAccount:
+    @pytest.mark.parametrize("number_kwargs", [{}, {"account_number": None}])
+    def test_accepts_omitted_or_none_account_number(
+        self,
+        account_creation_data: dict[str, Any],
+        number_kwargs: dict[str, Any],
+    ) -> None:
+        account = PremiumAccount(**account_creation_data, **number_kwargs)
+
+        assert re.fullmatch(r"[0-9a-f]{12}", account.account_number)
+        assert account.account_id == account_creation_data["account_id"]
+        assert account.get_account_type is AccountType.CURRENT
+
     @pytest.mark.parametrize(
         ("amount", "expected_balance"),
         [
