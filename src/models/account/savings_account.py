@@ -2,10 +2,10 @@ from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 
-from account_errors import InvalidOperationError, InsufficientFundsError
-from currency import Currency
-from models.abstract_account import Person, AccountType, AccountStatus
-from models.bank_account import BankAccount
+from models.account.account_errors import InvalidOperationError, InsufficientFundsError
+from models.account.currency import Currency
+from models.account.abstract_account import Person, AccountType, AccountStatus
+from models.account.bank_account import BankAccount
 
 class SavingsAccount(BankAccount):
     def __init__(self, person: Person,
@@ -33,7 +33,7 @@ class SavingsAccount(BankAccount):
         self.validate_currency(currency)
         self.validate_amount(amount)
 
-        if self.get_balance - amount < self.min_balance and self.get_balance - amount >= 0:
+        if self.get_balance - amount < self.min_balance:
             raise InsufficientFundsError(
                 f"Account {self.account_id} unable to make operation"
             )

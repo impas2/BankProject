@@ -3,8 +3,8 @@ from decimal import Decimal
 from enum import Enum
 from uuid import UUID
 
-from account_errors import InvalidOperationError
-from currency import Currency
+from models.account.account_errors import InvalidOperationError
+from models.account.currency import Currency
 
 
 class Person:

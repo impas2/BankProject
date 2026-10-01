@@ -2,10 +2,10 @@ from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 
-from account_errors import InvalidOperationError, InsufficientFundsError
-from currency import Currency
-from models.abstract_account import AccountType, Person, AccountStatus
-from models.bank_account import BankAccount
+from models.account.account_errors import InvalidOperationError, InsufficientFundsError
+from models.account.currency import Currency
+from models.account.abstract_account import AccountType, Person, AccountStatus
+from models.account.bank_account import BankAccount
 
 
 class PremiumAccount(BankAccount):

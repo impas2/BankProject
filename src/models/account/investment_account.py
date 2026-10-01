@@ -1,14 +1,14 @@
 from enum import Enum
 from types import MappingProxyType
 
-from account_errors import InvalidOperationError
+from models.account.account_errors import InvalidOperationError
 from decimal import Decimal
-from typing import Optional, Callable
+from typing import Optional
 from uuid import UUID
 
-from currency import Currency
-from models.abstract_account import AccountType, Person, AccountStatus
-from models.bank_account import BankAccount
+from models.account.currency import Currency
+from models.account.abstract_account import AccountType, Person, AccountStatus
+from models.account.bank_account import BankAccount
 
 
 class InvestmentActive(Enum):
@@ -80,6 +80,10 @@ class InvestmentAccount(BankAccount):
     @property
     def get_growth_rates(self):
         return self.growth_rates
+
+    def withdraw(self, amount: Decimal, currency: Currency) -> None:
+        """Снимает свободные деньги, не затрагивая инвестиционный портфель."""
+        super().withdraw(amount, currency)
 
     def invest(self, active_type: InvestmentActive, amount: Decimal) -> None:
         if not isinstance(active_type, InvestmentActive):

@@ -5,15 +5,15 @@ from typing import Any
 
 import pytest
 
-from account_errors import (
+from models.account.account_errors import (
     AccountClosedError,
     AccountFrozenError,
     InsufficientFundsError,
     InvalidOperationError,
 )
-from currency import Currency
-from models.abstract_account import AccountStatus, AccountType
-from models.premium_account import PremiumAccount
+from models.account.currency import Currency
+from models.account.abstract_account import AccountStatus, AccountType
+from models.account.premium_account import PremiumAccount
 
 
 @pytest.fixture

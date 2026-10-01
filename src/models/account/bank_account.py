@@ -3,14 +3,14 @@ from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 
-from account_errors import (
+from models.account.account_errors import (
     AccountClosedError,
     AccountFrozenError,
     InsufficientFundsError,
     InvalidOperationError,
 )
-from currency import Currency
-from models.abstract_account import AbstractAccount, AccountStatus, AccountType, Person
+from models.account.currency import Currency
+from models.account.abstract_account import AbstractAccount, AccountStatus, AccountType, Person
 
 
 class BankAccount(AbstractAccount):

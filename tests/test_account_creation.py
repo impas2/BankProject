@@ -5,10 +5,10 @@ from uuid import UUID, uuid4
 
 import pytest
 
-from account_errors import InvalidOperationError
-from currency import Currency
-from models.abstract_account import AccountStatus, AccountType, Person
-from models.bank_account import BankAccount
+from models.account.account_errors import InvalidOperationError
+from models.account.currency import Currency
+from models.account.abstract_account import AccountStatus, AccountType, Person
+from models.account.bank_account import BankAccount
 
 
 @pytest.fixture

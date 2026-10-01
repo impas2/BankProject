@@ -5,11 +5,11 @@ from uuid import uuid4
 
 import pytest
 
-from currency import Currency
-from models.abstract_account import Person
-from models.investment_account import InvestmentAccount
-from models.premium_account import PremiumAccount
-from models.savings_account import SavingsAccount
+from models.account.currency import Currency
+from models.account.abstract_account import Person
+from models.account.investment_account import InvestmentAccount
+from models.account.premium_account import PremiumAccount
+from models.account.savings_account import SavingsAccount
 
 
 def account_details() -> dict[str, Any]:

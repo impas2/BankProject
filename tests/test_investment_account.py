@@ -5,15 +5,15 @@ from typing import Any
 
 import pytest
 
-from account_errors import (
+from models.account.abstract_account import AccountStatus, AccountType
+from models.account.account_errors import (
     AccountClosedError,
     AccountFrozenError,
     InsufficientFundsError,
     InvalidOperationError,
 )
-from currency import Currency
-from models.abstract_account import AccountStatus, AccountType
-from models.investment_account import InvestmentAccount, InvestmentActive
+from models.account.currency import Currency
+from models.account.investment_account import InvestmentAccount, InvestmentActive
 
 
 @pytest.fixture
@@ -118,6 +118,28 @@ class TestInvestmentAccount:
         assert account.get_balance == Decimal("5000")
         assert account.get_portfolio == portfolio_before
 
+    @pytest.mark.parametrize("amount", [Decimal("100"), Decimal("1000")])
+    def test_withdraw_uses_free_cash_without_changing_portfolio(
+        self, invested_account: InvestmentAccount, amount: Decimal
+    ) -> None:
+        portfolio_before = dict(invested_account.get_portfolio)
+
+        invested_account.withdraw(amount, Currency.USD)
+
+        assert invested_account.get_balance == Decimal("1000") - amount
+        assert invested_account.get_portfolio == portfolio_before
+
+    def test_withdraw_rejects_wrong_currency_without_changing_state(
+        self, invested_account: InvestmentAccount
+    ) -> None:
+        portfolio_before = dict(invested_account.get_portfolio)
+
+        with pytest.raises(InvalidOperationError):
+            invested_account.withdraw(Decimal("100"), Currency.EUR)
+
+        assert invested_account.get_balance == Decimal("1000")
+        assert invested_account.get_portfolio == portfolio_before
+
     @pytest.mark.parametrize("operation", ["invest", "withdraw"])
     def test_invested_money_is_not_available_as_cash(
         self, invested_account: InvestmentAccount, operation: str
@@ -140,17 +162,22 @@ class TestInvestmentAccount:
             (AccountStatus.CLOSED, AccountClosedError),
         ],
     )
-    def test_inactive_account_rejects_investing_without_changing_state(
+    @pytest.mark.parametrize("operation", ["invest", "withdraw"])
+    def test_inactive_account_rejects_operations_without_changing_state(
         self,
         account: InvestmentAccount,
         status: AccountStatus,
         error: type[Exception],
+        operation: str,
     ) -> None:
         portfolio_before = dict(account.get_portfolio)
         account.account_status = status
 
         with pytest.raises(error):
-            account.invest(InvestmentActive.STOCKS, Decimal("100"))
+            if operation == "invest":
+                account.invest(InvestmentActive.STOCKS, Decimal("100"))
+            else:
+                account.withdraw(Decimal("100"), Currency.USD)
 
         assert account.get_balance == Decimal("5000")
         assert account.get_portfolio == portfolio_before

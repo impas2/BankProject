@@ -5,15 +5,15 @@ from typing import Any
 
 import pytest
 
-from account_errors import (
+from models.account.abstract_account import AccountStatus, AccountType
+from models.account.account_errors import (
     AccountClosedError,
     AccountFrozenError,
     InsufficientFundsError,
     InvalidOperationError,
 )
-from currency import Currency
-from models.abstract_account import AccountStatus, AccountType
-from models.savings_account import SavingsAccount
+from models.account.currency import Currency
+from models.account.savings_account import SavingsAccount
 
 
 @pytest.fixture
@@ -46,11 +46,15 @@ class TestSavingsAccount:
 
         assert account.get_balance == Decimal("1000") - amount
 
+    @pytest.mark.parametrize(
+        "amount",
+        [Decimal("700.01"), Decimal("1000"), Decimal("1000.01"), Decimal("1100")],
+    )
     def test_withdraw_rejects_balance_below_minimum(
-        self, account: SavingsAccount
+        self, account: SavingsAccount, amount: Decimal
     ) -> None:
         with pytest.raises(InsufficientFundsError):
-            account.withdraw(Decimal("700.01"), Currency.USD)
+            account.withdraw(amount, Currency.USD)
 
         assert account.get_balance == Decimal("1000")
 
@@ -63,6 +67,17 @@ class TestSavingsAccount:
         account.withdraw(Decimal("1000"), Currency.USD)
 
         assert account.get_balance == Decimal("0")
+
+    def test_zero_minimum_rejects_overdraft(
+        self,
+        make_savings_account: Callable[..., SavingsAccount],
+    ) -> None:
+        account = make_savings_account(min_balance=Decimal("0"))
+
+        with pytest.raises(InsufficientFundsError):
+            account.withdraw(Decimal("1000.01"), Currency.USD)
+
+        assert account.get_balance == Decimal("1000")
 
     def test_withdraw_rejects_invalid_amount_without_changing_balance(
         self, account: SavingsAccount, invalid_nonnegative_decimal: Any
