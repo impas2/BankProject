@@ -17,7 +17,7 @@ class PremiumAccount(BankAccount):
                  withdrawal_fee: Decimal = Decimal(0),
                  ) -> None:
 
-        super().__init__(person, account_id, currency, account_number, AccountType.CURRENT)
+        super().__init__(person, account_id, currency, account_number, AccountType.PREMIUM)
 
         if not isinstance(withdrawal_limit, Decimal):
             raise InvalidOperationError("Лимит вывода должен быть Decimal")

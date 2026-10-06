@@ -1,6 +1,7 @@
 import abc
 from decimal import Decimal
 from enum import Enum
+from json.decoder import NaN
 from uuid import UUID
 
 from models.account.account_errors import InvalidOperationError
@@ -10,6 +11,10 @@ from models.account.currency import Currency
 class Person:
     def __init__(self, name: str, age: int, address: str, birth_date: str) -> None:
         self.name = name
+        if type(age) is not int or age < 0:
+            raise InvalidOperationError(
+                "Age must be a non-negative integer"
+            )
         self.age = age
         self.address = address
         self.birth_date = birth_date
@@ -28,6 +33,7 @@ class AccountType(Enum):
     CURRENT = 0
     SAVINGS = 1
     INVESTMENT = 2
+    PREMIUM = 3
 
 
 class AbstractAccount(abc.ABC):

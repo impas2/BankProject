@@ -32,7 +32,7 @@ class TestPremiumAccount:
 
         assert re.fullmatch(r"[0-9a-f]{12}", account.account_number)
         assert account.account_id == account_creation_data["account_id"]
-        assert account.get_account_type is AccountType.CURRENT
+        assert account.get_account_type is AccountType.PREMIUM
 
     @pytest.mark.parametrize(
         ("amount", "expected_balance"),

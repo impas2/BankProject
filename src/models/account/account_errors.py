@@ -16,3 +16,6 @@ class InvalidOperationError(AccountError):
 
 class InsufficientFundsError(AccountError):
     pass
+
+class AccountTypeNotAllowedError(AccountError):
+    pass
